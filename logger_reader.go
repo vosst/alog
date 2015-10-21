@@ -42,12 +42,12 @@ func (self LoggerReader) ReadNext() (*Entry, error) {
 	reader := bytes.NewReader(self.buf)
 
 	type Wire struct {
-		Length uint16
-		_      uint16
-		Pid    int32
-		Tid    int32
-		Sec    int32
-		Nsec   int32
+		Len  uint16
+		_    uint16
+		Pid  int32
+		Tid  int32
+		Sec  int32
+		Nsec int32
 	}
 
 	wire := Wire{}
@@ -67,7 +67,7 @@ func (self LoggerReader) ReadNext() (*Entry, error) {
 			When:     Timestamp{Seconds: wire.Sec, Nanoseconds: wire.Nsec},
 			Priority: Priority(buf[0]),
 			Tag:      Tag(buf[1 : tagEnd+1]),
-			Message:  string(buf[tagEnd+1:]),
+			Message:  string(buf[tagEnd+1 : wire.Len-1]),
 			Euid:     nil,
 			Id:       nil,
 		}, nil
