@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"syscall"
 )
@@ -67,7 +68,7 @@ func (self LoggerReader) ReadNext() (*Entry, error) {
 			When:     Timestamp{Seconds: wire.Sec, Nanoseconds: wire.Nsec},
 			Priority: Priority(buf[0]),
 			Tag:      Tag(buf[1 : tagEnd+1]),
-			Message:  string(buf[tagEnd+1 : wire.Len-1]),
+			Message:  strings.TrimSpace(string(buf[tagEnd+1 : wire.Len-1])),
 			Euid:     nil,
 			Id:       nil,
 		}, nil
