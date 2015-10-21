@@ -45,7 +45,7 @@ func (self LoggerReader) ReadNext() (*Entry, error) {
 		Tid     int32
 		Sec     int32
 		Nsec    int32
-		Message string
+		Payload []byte
 	}
 
 	wire := Wire{}
