@@ -1,5 +1,10 @@
 package alog
 
+import (
+	"errors"
+	"time"
+)
+
 // ErrReadTimeout is returned if a call to ReadNext times out.
 var ErrReadTimeout = errors.New("Reading the next entry from the log failed")
 
