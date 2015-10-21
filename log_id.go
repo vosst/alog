@@ -5,10 +5,10 @@ type LogId int
 
 const (
 	LogIdMain   LogId = 0
-	LogIdRadio        = 1
-	LogIdEvents       = 2
-	LogIdSystem       = 3
-	LogIdCrash        = 4
+	LogIdRadio  LogId = 1
+	LogIdEvents LogId = 2
+	LogIdSystem LogId = 3
+	LogIdCrash  LogId = 4
 )
 
 // String returns the name of a LogId
