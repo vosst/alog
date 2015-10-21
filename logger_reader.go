@@ -3,6 +3,7 @@ package alog
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -54,16 +55,23 @@ func (self LoggerReader) ReadNext() (*Entry, error) {
 		return nil, err
 	}
 
-	if buf, err = ioutil.ReadAll(reader); err != nil {
+	if buf, err := ioutil.ReadAll(reader); err != nil {
 		return nil, err
-	} else {
+	} else if len(buf) > 3 { // We need at least a priority, and two \0.
+
+		tagEnd := bytes.Index(buf[1:], []byte{'0'})
+
 		return &Entry{
-			Pid:     wire.Pid,
-			Tid:     wire.Tid,
-			When:    Timestamp{Seconds: wire.Sec, Nanoseconds: wire.Nsec},
-			Message: string(buf),
-			Euid:    nil,
-			Id:      nil,
+			Pid:      wire.Pid,
+			Tid:      wire.Tid,
+			When:     Timestamp{Seconds: wire.Sec, Nanoseconds: wire.Nsec},
+			Priority: Priority(buf[0]),
+			Tag:      Tag(buf[1:tagEnd]),
+			Message:  string(buf[tagEnd:]),
+			Euid:     nil,
+			Id:       nil,
 		}, nil
+	} else {
+		return nil, errors.New("Invalid log entry")
 	}
 }
