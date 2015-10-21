@@ -58,16 +58,15 @@ func (self LoggerReader) ReadNext() (*Entry, error) {
 	if buf, err := ioutil.ReadAll(reader); err != nil {
 		return nil, err
 	} else if len(buf) > 3 { // We need at least a priority, and two \0.
-
-		tagEnd := bytes.Index(buf[1:], []byte{'0'})
+		tagEnd := bytes.IndexAny(buf[1:], "\x00")
 
 		return &Entry{
 			Pid:      wire.Pid,
 			Tid:      wire.Tid,
 			When:     Timestamp{Seconds: wire.Sec, Nanoseconds: wire.Nsec},
 			Priority: Priority(buf[0]),
-			Tag:      Tag(buf[1:tagEnd]),
-			Message:  string(buf[tagEnd:]),
+			Tag:      Tag(buf[1 : tagEnd+1]),
+			Message:  string(buf[tagEnd+1:]),
 			Euid:     nil,
 			Id:       nil,
 		}, nil
