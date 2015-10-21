@@ -23,8 +23,7 @@ func readFromLogWorks(log LogId, t *testing.T) {
 		t.Logf("%+v\n", entry)
 	}
 
-	assert.True(t, atLeastOne)
-
+	assert.True(t, atLeastOne, "Log ", log, " is empty")
 }
 
 func TestReadFromLogsWorks(t *testing.T) {
