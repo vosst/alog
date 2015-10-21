@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"syscall"
 )
 
 // Max size of a log entry when reading
@@ -21,7 +22,7 @@ type LoggerReader struct {
 }
 
 func NewLoggerReader(id LogId) (*LoggerReader, error) {
-	f, err := os.Open(filepath.Join("/dev", "alog", id.String()))
+	f, err := os.OpenFile(filepath.Join("/dev", "alog", id.String()), syscall.O_NONBLOCK|syscall.O_RDONLY, os.FileMode(0))
 	if err != nil {
 		return nil, err
 	}
