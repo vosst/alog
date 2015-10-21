@@ -3,6 +3,7 @@ package alog
 import (
 	"bytes"
 	"encoding/binary"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sync"
