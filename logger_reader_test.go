@@ -14,7 +14,7 @@ func readFromLogWorks(log LogId, t *testing.T) {
 		t.Skipf("Android logging facilities are not accessible [%s]", err)
 	}
 
-	lr, err := NewLoggerReader(log)
+	lr, err := NewLoggerReader(log, LoggerAbiV1)
 	assert.Nil(t, err)
 
 	lr.SetDeadline(time.Now().Add(500 * time.Millisecond))
