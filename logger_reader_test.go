@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func readFromLogWorks(log LogId, abiVersion int, t *testing.T) {
@@ -15,7 +16,7 @@ func readFromLogWorks(log LogId, abiVersion int, t *testing.T) {
 	}
 
 	lr, err := NewLoggerReader(log, abiVersion)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	lr.SetDeadline(time.Now().Add(500 * time.Millisecond))
 
