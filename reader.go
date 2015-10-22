@@ -2,7 +2,6 @@ package alog
 
 import (
 	"errors"
-	"time"
 )
 
 // ErrReadTimeout is returned if a call to ReadNext times out.
