@@ -2,7 +2,7 @@ package alog
 
 // #include <sys/ioctl.h>
 // #define __LOGGERIO 0xAE
-// #define LOGGER_GET_LOG_BUF_SIZE		_IO(__LOGGERIO, 1) /* size of log */
+// #define LOGGER_GET_LOG_BUF_SIZE	_IO(__LOGGERIO, 1) /* size of log */
 // #define LOGGER_GET_LOG_LEN		_IO(__LOGGERIO, 2) /* used log len */
 // #define LOGGER_GET_NEXT_ENTRY_LEN	_IO(__LOGGERIO, 3) /* next entry len */
 // #define LOGGER_FLUSH_LOG		_IO(__LOGGERIO, 4) /* flush log */
