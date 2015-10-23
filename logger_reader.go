@@ -2,12 +2,13 @@ package alog
 
 // #include <sys/ioctl.h>
 // #define __LOGGERIO 0xAE
-// #define LOGGER_GET_LOG_BUF_SIZE	_IO(__LOGGERIO, 1) /* size of log */
-// #define LOGGER_GET_LOG_LEN		_IO(__LOGGERIO, 2) /* used log len */
-// #define LOGGER_GET_NEXT_ENTRY_LEN	_IO(__LOGGERIO, 3) /* next entry len */
-// #define LOGGER_FLUSH_LOG		_IO(__LOGGERIO, 4) /* flush log */
-// #define LOGGER_GET_VERSION		_IO(__LOGGERIO, 5) /* abi version */
 // #define LOGGER_SET_VERSION		_IO(__LOGGERIO, 6) /* abi version */
+//
+// int RequestLoggerAbiV2(int fd)
+// {
+//     static int version = 2;
+//     return ioctl(fd, LOGGER_SET_VERSION, &version);
+// }
 import "C"
 
 import (
@@ -15,11 +16,11 @@ import (
 	"encoding/binary"
 	"errors"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
-	"unsafe"
 
 	"github.com/npat-efault/poller"
 )
@@ -29,23 +30,6 @@ const (
 	LoggerAbiV1  = 1        // Assume logger ABI version 1
 	LoggerAbiV2  = 2        // Assume logger ABI version 2
 )
-
-var (
-	loggerIoctlGetLogBufSize   int = C.LOGGER_GET_LOG_BUF_SIZE   // Query the size of the log
-	loggerIoctlGetLogLen       int = C.LOGGER_GET_LOG_LEN        // Query the current length of the log
-	loggerIoctlGetNextEntryLen int = C.LOGGER_GET_NEXT_ENTRY_LEN // Query the length of the next entry
-	loggerIoctlFlushLog        int = C.LOGGER_FLUSH_LOG          // Flush the log
-	loggerIoctlGetVersion      int = C.LOGGER_GET_VERSION        // Query the ABI version
-	loggerIoctlSetVersion      int = C.LOGGER_SET_VERSION        // Set the ABI version
-)
-
-func ioctl(fd, cmd, ptr uintptr) error {
-	_, _, e := syscall.Syscall(syscall.SYS_IOCTL, fd, cmd, ptr)
-	if e != 0 {
-		return e
-	}
-	return nil
-}
 
 type wire struct {
 	Len  uint16
@@ -70,23 +54,23 @@ type LoggerReader struct {
 func NewLoggerReader(id LogId, abiVersion int) (*LoggerReader, error) {
 	fn := filepath.Join("/dev", "alog", id.String())
 
-	f, err := poller.Open(fn, poller.O_RO)
+	f, err := os.Open(fn)
+	if err != nil {
+		return nil, err
+	}
+
+	p, err := poller.NewFD(int(f.Fd()))
 	if err != nil {
 		return nil, err
 	}
 
 	if abiVersion == LoggerAbiV2 {
-		sfd := f.Sysfd()
-		fd := uintptr(unsafe.Pointer(&sfd))
-		cmd := uintptr(unsafe.Pointer(&loggerIoctlSetVersion))
-		ptr := uintptr(unsafe.Pointer(&abiVersion))
-
-		if err = ioctl(fd, cmd, ptr); err != nil {
-			return nil, err
+		if res := C.RequestLoggerAbiV2(C.int(f.Fd())); res != 0 {
+			return nil, syscall.Errno(res)
 		}
 	}
 
-	return &LoggerReader{abiVersion: abiVersion, f: f, buf: make([]byte, maxEntrySize, maxEntrySize)}, nil
+	return &LoggerReader{abiVersion: abiVersion, f: p, buf: make([]byte, maxEntrySize, maxEntrySize)}, nil
 }
 
 // SetDeadline adjusts the deadline for reading for a LoggerReader.
