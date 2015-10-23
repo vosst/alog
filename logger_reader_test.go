@@ -7,15 +7,16 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func readFromLogWorks(log LogId, t *testing.T) {
+func readFromLogWorks(log LogId, abiVersion int, t *testing.T) {
 	if _, err := os.Open(filepath.Join("/dev", "alog", log.String())); err != nil {
 		t.Skipf("Android logging facilities are not accessible [%s]", err)
 	}
 
-	lr, err := NewLoggerReader(log)
-	assert.Nil(t, err)
+	lr, err := NewLoggerReader(log, abiVersion)
+	require.NoError(t, err)
 
 	lr.SetDeadline(time.Now().Add(500 * time.Millisecond))
 
@@ -30,9 +31,16 @@ func readFromLogWorks(log LogId, t *testing.T) {
 	assert.True(t, atLeastOne, "Log ", log, " is empty")
 }
 
-func TestReadFromLogsWorks(t *testing.T) {
-	readFromLogWorks(LogIdMain, t)
-	readFromLogWorks(LogIdRadio, t)
-	readFromLogWorks(LogIdEvents, t)
-	readFromLogWorks(LogIdSystem, t)
+func TestReadFromLogsWorksForAbiV1(t *testing.T) {
+	readFromLogWorks(LogIdMain, LoggerAbiV1, t)
+	readFromLogWorks(LogIdRadio, LoggerAbiV1, t)
+	readFromLogWorks(LogIdEvents, LoggerAbiV1, t)
+	readFromLogWorks(LogIdSystem, LoggerAbiV1, t)
+}
+
+func TestReadFromLogsWorksForAbiV2(t *testing.T) {
+	readFromLogWorks(LogIdMain, LoggerAbiV2, t)
+	readFromLogWorks(LogIdRadio, LoggerAbiV2, t)
+	readFromLogWorks(LogIdEvents, LoggerAbiV2, t)
+	readFromLogWorks(LogIdSystem, LoggerAbiV2, t)
 }
