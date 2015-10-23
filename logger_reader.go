@@ -31,6 +31,9 @@ const (
 	LoggerAbiV2  = 2        // Assume logger ABI version 2
 )
 
+// wire bundles all the fields available on the wire.
+// Used for parsing a single entry received from the Android logging
+// facilities.
 type wire struct {
 	Len  uint16
 	_    uint16
