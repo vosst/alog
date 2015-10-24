@@ -13,6 +13,7 @@ var ErrReadTimeout = errors.New("Reading the next entry from the log timed out")
 type Reader interface {
 	// A Reader has to be closed explicitly.
 	io.Closer
+
 	// SetDeadline adjusts the deadline such that all subsequent calls to
 	// ReadNext will fail if they exceed t.
 	SetDeadline(t time.Time) error
