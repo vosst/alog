@@ -76,6 +76,13 @@ func NewLoggerReader(id LogId, abiVersion int) (*LoggerReader, error) {
 	return &LoggerReader{abiVersion: abiVersion, f: p, buf: make([]byte, maxEntrySize, maxEntrySize)}, nil
 }
 
+// Close() closes the underlying connection to the Android logger facilities.
+//
+// Outstanding ReadNext operations are cancelled and return an error.
+func (self *LoggerReader) Close() error {
+	return self.f.Close()
+}
+
 // SetDeadline adjusts the deadline for reading for a LoggerReader.
 //
 // Returns an error if an issue arises in talking to the underlying

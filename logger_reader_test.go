@@ -10,13 +10,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func readFromLogWorks(log LogId, abiVersion int, t *testing.T) {
+func skipIfNoAndroidLoggingFacilities(log LogId, t *testing.T) {
 	if _, err := os.Open(filepath.Join("/dev", "alog", log.String())); err != nil {
 		t.Skipf("Android logging facilities are not accessible [%s]", err)
 	}
+}
+
+func readFromLogWorks(log LogId, abiVersion int, t *testing.T) {
+	skipIfNoAndroidLoggingFacilities(log, t)
 
 	lr, err := NewLoggerReader(log, abiVersion)
 	require.NoError(t, err)
+
+	defer lr.Close()
 
 	lr.SetDeadline(time.Now().Add(500 * time.Millisecond))
 
