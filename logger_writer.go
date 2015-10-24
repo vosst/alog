@@ -3,6 +3,7 @@ package alog
 import (
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/tedb/vectorio"
 )
@@ -30,6 +31,13 @@ func NewLoggerWriter(id LogId) (*LoggerWriter, error) {
 // Close shuts down the connection to Android's kernel logger.
 func (self *LoggerWriter) Close() error {
 	return self.f.Close()
+}
+
+// SetDeadline is noop for LoggerWriter. The Android kernel logging
+// facilities always report the underlying file as writable. For that,
+// polling would be pointless and we can just hand out our write request.
+func (self *LoggerWriter) SetDeadline(t time.Time) error {
+	return nil
 }
 
 // Write sends a log with prio, tag and message to Android's kernel logger.
