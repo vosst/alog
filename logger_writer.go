@@ -50,6 +50,10 @@ func (self *LoggerWriter) Write(prio Priority, tag Tag, message string) error {
 		[]byte(message),
 	}
 
+	// Both the tag and the message need to be null-terminated
+	iov[1] = append(iov[1], '\x00')
+	iov[2] = append(iov[2], '\x00')
+
 	_, err := vectorio.Writev(self.f, iov)
 	return err
 }
