@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -49,4 +50,25 @@ func TestReadFromLogsWorksForAbiV2(t *testing.T) {
 	readFromLogWorks(LogIdRadio, LoggerAbiV2Extension{}, t)
 	readFromLogWorks(LogIdEvents, LoggerAbiV2Extension{}, t)
 	readFromLogWorks(LogIdSystem, LoggerAbiV2Extension{}, t)
+}
+
+func TestLoggerReaderCallsNonNilAbiExtension(t *testing.T) {
+	skipIfNoAndroidLoggingFacilities(LogIdMain, t)
+
+	m := make(map[string]interface{})
+	mae := &MockLoggerAbiExtension{}
+
+	mae.On("Prepare", mock.Anything).Return(nil)
+	mae.On("Read", mock.Anything).Return(m, nil)
+
+	lr, err := NewLoggerReader(LogIdMain, mae)
+	require.NoError(t, err)
+
+	defer lr.Close()
+
+	_, err = lr.ReadNext()
+	assert.NoError(t, err)
+
+	mae.AssertNumberOfCalls(t, "Prepare", 1)
+	mae.AssertNumberOfCalls(t, "Read", 1)
 }
