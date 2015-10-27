@@ -19,7 +19,7 @@ func testLoggerWriterWorks(logId LogId, t *testing.T) {
 
 	writer.Write(PriorityDebug, testTag, "42")
 
-	reader, err := NewLoggerReader(logId, LoggerAbiV1)
+	reader, err := NewLoggerReader(logId, nil)
 	require.NoError(t, err)
 
 	defer reader.Close()
