@@ -16,10 +16,10 @@ func skipIfNoAndroidLoggingFacilities(log LogId, t *testing.T) {
 	}
 }
 
-func readFromLogWorks(log LogId, abiVersion int, t *testing.T) {
+func readFromLogWorks(log LogId, abiExtension LoggerAbiExtension, t *testing.T) {
 	skipIfNoAndroidLoggingFacilities(log, t)
 
-	lr, err := NewLoggerReader(log, abiVersion)
+	lr, err := NewLoggerReader(log, abiExtension)
 	require.NoError(t, err)
 
 	defer lr.Close()
@@ -38,15 +38,15 @@ func readFromLogWorks(log LogId, abiVersion int, t *testing.T) {
 }
 
 func TestReadFromLogsWorksForAbiV1(t *testing.T) {
-	readFromLogWorks(LogIdMain, LoggerAbiV1, t)
-	readFromLogWorks(LogIdRadio, LoggerAbiV1, t)
-	readFromLogWorks(LogIdEvents, LoggerAbiV1, t)
-	readFromLogWorks(LogIdSystem, LoggerAbiV1, t)
+	readFromLogWorks(LogIdMain, nil, t)
+	readFromLogWorks(LogIdRadio, nil, t)
+	readFromLogWorks(LogIdEvents, nil, t)
+	readFromLogWorks(LogIdSystem, nil, t)
 }
 
 func TestReadFromLogsWorksForAbiV2(t *testing.T) {
-	readFromLogWorks(LogIdMain, LoggerAbiV2, t)
-	readFromLogWorks(LogIdRadio, LoggerAbiV2, t)
-	readFromLogWorks(LogIdEvents, LoggerAbiV2, t)
-	readFromLogWorks(LogIdSystem, LoggerAbiV2, t)
+	readFromLogWorks(LogIdMain, LoggerAbiV2Extension{}, t)
+	readFromLogWorks(LogIdRadio, LoggerAbiV2Extension{}, t)
+	readFromLogWorks(LogIdEvents, LoggerAbiV2Extension{}, t)
+	readFromLogWorks(LogIdSystem, LoggerAbiV2Extension{}, t)
 }
