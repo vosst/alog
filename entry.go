@@ -52,12 +52,11 @@ const (
 
 // An Entry models an individual log message.
 type Entry struct {
-	Pid      int32     // Generating process's ID
-	Tid      int32     // Generating thread's ID
-	When     Timestamp // When the entry was logged
-	Priority Priority  // Priority of the message
-	Tag      Tag       // Tag describing the origin of the message
-	Message  string    // The actual message of the Entry
-	Euid     *uint32   // Effective user ID of the logger, may be nil
-	Id       *LogId    // Id of the log that the entry comes from, may be nil
+	Pid      int32                  // Generating process's ID
+	Tid      int32                  // Generating thread's ID
+	When     Timestamp              // When the entry was logged
+	Priority Priority               // Priority of the message
+	Tag      Tag                    // Tag describing the origin of the message
+	Message  string                 // The actual message of the Entry
+	Ext      map[string]interface{} // Vendor specific extensions to individual entries
 }
