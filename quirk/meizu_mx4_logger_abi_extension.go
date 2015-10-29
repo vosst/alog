@@ -1,5 +1,10 @@
 package quirk
 
+import (
+	"encoding/binary"
+	"io"
+)
+
 // A MeizuMx4LoggerAbiExtension reads the additional timezone field
 // as defined in the kernel source code at:
 //   https://github.com/meizuosc/m75/blob/master/kernel/drivers/staging/android/logger.h.
@@ -20,5 +25,5 @@ func (self MeizuMx4LoggerAbiExtension) Read(reader io.Reader) (map[string]interf
 		return nil, err
 	}
 
-	return map[string]interface{}{"tz", tz}, nil
+	return map[string]interface{}{"tz": tz}, nil
 }

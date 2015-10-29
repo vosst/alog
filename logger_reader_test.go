@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"github.com/vosst/alog/quirk"
 )
 
 func skipIfNoAndroidLoggingFacilities(log LogId, t *testing.T) {
@@ -46,10 +47,13 @@ func TestReadFromLogsWorksForAbiV1(t *testing.T) {
 }
 
 func TestReadFromLogsWorksForAbiV2(t *testing.T) {
-	readFromLogWorks(LogIdMain, LoggerAbiV2Extension{}, t)
-	readFromLogWorks(LogIdRadio, LoggerAbiV2Extension{}, t)
-	readFromLogWorks(LogIdEvents, LoggerAbiV2Extension{}, t)
-	readFromLogWorks(LogIdSystem, LoggerAbiV2Extension{}, t)
+	cext := ChainedLoggerAbiExtension{
+		Extensions: []LoggerAbiExtension{&quirk.MeizuMx4LoggerAbiExtension{}, &LoggerAbiV2Extension{}},
+	}
+	readFromLogWorks(LogIdMain, cext, t)
+	readFromLogWorks(LogIdRadio, cext, t)
+	readFromLogWorks(LogIdEvents, cext, t)
+	readFromLogWorks(LogIdSystem, cext, t)
 }
 
 func TestLoggerReaderCallsNonNilAbiExtension(t *testing.T) {
