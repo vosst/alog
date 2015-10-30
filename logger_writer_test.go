@@ -12,17 +12,22 @@ var testTag = Tag("Test")
 func testLoggerWriterWorks(logId LogId, t *testing.T) {
 	skipIfNoAndroidLoggingFacilities(logId, t)
 
+	reader, err := NewLoggerReader(logId, nil)
+	require.NoError(t, err)
+
+	defer reader.Close()
+
+	reader.SetDeadline(time.Now().Add(500 * time.Millisecond))
+	for _, err := reader.ReadNext(); err == nil; _, err = reader.ReadNext() {
+		reader.SetDeadline(time.Now().Add(500 * time.Millisecond))
+	}
+
 	writer, err := NewLoggerWriter(logId)
 	require.NoError(t, err)
 
 	defer writer.Close()
 
 	writer.Write(PriorityDebug, testTag, "42")
-
-	reader, err := NewLoggerReader(logId, nil)
-	require.NoError(t, err)
-
-	defer reader.Close()
 
 	reader.SetDeadline(time.Now().Add(500 * time.Millisecond))
 	entry, err := reader.ReadNext()
