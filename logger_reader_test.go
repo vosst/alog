@@ -62,7 +62,6 @@ func TestLoggerReaderCallsNonNilAbiExtension(t *testing.T) {
 	m := make(map[string]interface{})
 	mae := &MockLoggerAbiExtension{}
 
-	mae.On("Prepare", mock.Anything).Return(nil)
 	mae.On("Read", mock.Anything).Return(m, nil)
 
 	lr, err := NewLoggerReader(LogIdMain, mae)
@@ -73,6 +72,5 @@ func TestLoggerReaderCallsNonNilAbiExtension(t *testing.T) {
 	_, err = lr.ReadNext()
 	assert.NoError(t, err)
 
-	mae.AssertNumberOfCalls(t, "Prepare", 1)
 	mae.AssertNumberOfCalls(t, "Read", 1)
 }
