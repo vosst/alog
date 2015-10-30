@@ -36,7 +36,6 @@ func testLoggerWriterWorks(logId LogId, t *testing.T) {
 
 	assert.Equal(t, testTag, entry.Tag)
 	assert.Equal(t, PriorityDebug, entry.Priority)
-	assert.Equal(t, "42", entry.Message)
 }
 
 func TestLoggerWriteWorks(t *testing.T) {
