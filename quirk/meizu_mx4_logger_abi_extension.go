@@ -11,11 +11,6 @@ import (
 type MeizuMx4LoggerAbiExtension struct {
 }
 
-// Prepare is a noop, always returning nil.
-func (self MeizuMx4LoggerAbiExtension) Prepare(fd int) error {
-	return nil
-}
-
 // Read reads the tz field from reader, returning it under key "tz".
 //
 // Returns an error if reading from reader fails.

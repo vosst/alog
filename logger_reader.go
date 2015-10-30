@@ -42,12 +42,20 @@ type wire struct {
 	Nsec int32
 }
 
+// requestExtendedLoggerAbi issues an ioctl on fd to request AOSP Logger wire format v2.
+//
+// Returns an error if the ioctl on fd fails.
+func requestExtendedLoggerAbi(fd int) error {
+	if rc := C.RequestLoggerAbiV2(C.int(fd)); rc != 0 {
+		return syscall.Errno(rc)
+	}
+
+	return nil
+}
+
 // A LoggerAbiExtension models additions to the logger v1 wire format defined by
 // AOSP.
 type LoggerAbiExtension interface {
-	// Prepare allows implementations to carry out setup steps
-	// on fd representing a connection to Android's logger facilities.
-	Prepare(fd int) error
 	// Read allows implementations to unmarshal addition fields from a reader
 	// into the buffer returned by a single read call to Android's logger facilities.
 	Read(reader io.Reader) (map[string]interface{}, error)
@@ -56,17 +64,6 @@ type LoggerAbiExtension interface {
 // A LoggerAbiV2Extension implements LoggerAbiExtension, reading the
 // additional euid field.
 type LoggerAbiV2Extension struct {
-}
-
-// Prepare issues an ioctl on fd to request AOSP Logger wire format v2.
-//
-// Returns an error if the ioctl on fd fails.
-func (self LoggerAbiV2Extension) Prepare(fd int) error {
-	if rc := C.RequestLoggerAbiV2(C.int(fd)); rc != 0 {
-		return syscall.Errno(rc)
-	}
-
-	return nil
 }
 
 // Read unmarshals the additional euid field from reader, and return it in the extension map under key 'euid'.
@@ -106,7 +103,7 @@ func NewLoggerReader(id LogId, abiExtension LoggerAbiExtension) (*LoggerReader, 
 	}
 
 	if abiExtension != nil {
-		if err = abiExtension.Prepare(int(f.Fd())); err != nil {
+		if err = requestExtendedLoggerAbi(int(f.Fd())); err != nil {
 			return nil, err
 		}
 	}

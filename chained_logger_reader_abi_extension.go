@@ -8,19 +8,6 @@ type ChainedLoggerAbiExtension struct {
 	Extensions []LoggerAbiExtension // All extensions managed by a ChainedLoggerAbiExtension
 }
 
-// Prepare forwards the call to all extensions known to self.
-//
-// Returns an error if any of the extensions known to self errors out.
-func (self ChainedLoggerAbiExtension) Prepare(fd int) error {
-	for _, ext := range self.Extensions {
-		if err := ext.Prepare(fd); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 // Read forwards the call to all extensions known to self, merging all results
 // into a single extension map.
 //
