@@ -7,7 +7,9 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"github.com/vosst/alog/quirk"
 )
 
 func skipIfNoAndroidLoggingFacilities(log LogId, t *testing.T) {
@@ -16,10 +18,10 @@ func skipIfNoAndroidLoggingFacilities(log LogId, t *testing.T) {
 	}
 }
 
-func readFromLogWorks(log LogId, abiVersion int, t *testing.T) {
+func readFromLogWorks(log LogId, abiExtension LoggerAbiExtension, t *testing.T) {
 	skipIfNoAndroidLoggingFacilities(log, t)
 
-	lr, err := NewLoggerReader(log, abiVersion)
+	lr, err := NewLoggerReader(log, abiExtension)
 	require.NoError(t, err)
 
 	defer lr.Close()
@@ -38,15 +40,37 @@ func readFromLogWorks(log LogId, abiVersion int, t *testing.T) {
 }
 
 func TestReadFromLogsWorksForAbiV1(t *testing.T) {
-	readFromLogWorks(LogIdMain, LoggerAbiV1, t)
-	readFromLogWorks(LogIdRadio, LoggerAbiV1, t)
-	readFromLogWorks(LogIdEvents, LoggerAbiV1, t)
-	readFromLogWorks(LogIdSystem, LoggerAbiV1, t)
+	readFromLogWorks(LogIdMain, nil, t)
+	readFromLogWorks(LogIdRadio, nil, t)
+	readFromLogWorks(LogIdEvents, nil, t)
+	readFromLogWorks(LogIdSystem, nil, t)
 }
 
 func TestReadFromLogsWorksForAbiV2(t *testing.T) {
-	readFromLogWorks(LogIdMain, LoggerAbiV2, t)
-	readFromLogWorks(LogIdRadio, LoggerAbiV2, t)
-	readFromLogWorks(LogIdEvents, LoggerAbiV2, t)
-	readFromLogWorks(LogIdSystem, LoggerAbiV2, t)
+	cext := ChainedLoggerAbiExtension{
+		Extensions: []LoggerAbiExtension{&quirk.MeizuMx4LoggerAbiExtension{}, &LoggerAbiV2Extension{}},
+	}
+	readFromLogWorks(LogIdMain, cext, t)
+	readFromLogWorks(LogIdRadio, cext, t)
+	readFromLogWorks(LogIdEvents, cext, t)
+	readFromLogWorks(LogIdSystem, cext, t)
+}
+
+func TestLoggerReaderCallsNonNilAbiExtension(t *testing.T) {
+	skipIfNoAndroidLoggingFacilities(LogIdMain, t)
+
+	m := make(map[string]interface{})
+	mae := &MockLoggerAbiExtension{}
+
+	mae.On("Read", mock.Anything).Return(m, nil)
+
+	lr, err := NewLoggerReader(LogIdMain, mae)
+	require.NoError(t, err)
+
+	defer lr.Close()
+
+	_, err = lr.ReadNext()
+	assert.NoError(t, err)
+
+	mae.AssertNumberOfCalls(t, "Read", 1)
 }
