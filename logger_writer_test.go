@@ -55,3 +55,17 @@ func TestLoggerWriteWorks(t *testing.T) {
 	testLoggerWriterWorks(LogIdEvents, t)
 	testLoggerWriterWorks(LogIdSystem, t)
 }
+
+func ExampleLoggerWriter() {
+	writer, err := NewLoggerWriter(LogIdMain)
+	if err != nil {
+		panic(err)
+	}
+
+	// The writer has to be closed explicitly.
+	defer writer.Close()
+
+	// Log a debug entry with tag 'A funky tag' and a message
+	// giving the answer to life, the universe and everything.
+	writer.Write(PriorityDebug, "A funky tag", "42")
+}
