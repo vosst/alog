@@ -57,3 +57,27 @@ func (self *LoggerWriter) Write(prio Priority, tag Tag, message string) error {
 	_, err := vectorio.Writev(self.f, iov)
 	return err
 }
+
+func (self *LoggerWriter) V(tag Tag, message string) error {
+	return self.Write(PriorityVerbose, tag, message)
+}
+
+func (self *LoggerWriter) D(tag Tag, message string) error {
+	return self.Write(PriorityDebug, tag, message)
+}
+
+func (self *LoggerWriter) I(tag Tag, message string) error {
+	return self.Write(PriorityInfo, tag, message)
+}
+
+func (self *LoggerWriter) W(tag Tag, message string) error {
+	return self.Write(PriorityWarn, tag, message)
+}
+
+func (self *LoggerWriter) E(tag Tag, message string) error {
+	return self.Write(PriorityError, tag, message)
+}
+
+func (self *LoggerWriter) F(tag Tag, message string) error {
+	return self.Write(PriorityFatal, tag, message)
+}
