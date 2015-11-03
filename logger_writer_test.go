@@ -120,3 +120,17 @@ func ExampleLoggerWriter() {
 	// giving the answer to life, the universe and everything.
 	writer.Write(PriorityDebug, "A funky tag", "42")
 }
+
+func ExampleLoggerWriter_second() {
+	main, err := NewLoggerWriter(LogIdMain)
+	if err != nil {
+		panic(err)
+	}
+
+	defer main.Close()
+
+	// Log a debug entry with tag 'A funky tag' and a message
+	// giving the answer to life, the universe and everything.
+	main.D("A funky tag", "42")
+
+}
