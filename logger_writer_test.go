@@ -78,33 +78,32 @@ func TestLoggerWriterConvenienceWorks(t *testing.T) {
 	writer.V(testTag, "V")
 	reader.SetDeadline(time.Now().Add(500 * time.Millisecond))
 	entry, _ := reader.ReadNext()
+	require.NotNil(t, entry)
 	assert.Equal(t, PriorityVerbose, entry.Priority)
 
 	writer.D(testTag, "D")
 	reader.SetDeadline(time.Now().Add(500 * time.Millisecond))
 	entry, _ = reader.ReadNext()
+	require.NotNil(t, entry)
 	assert.Equal(t, PriorityDebug, entry.Priority)
 
 	writer.I(testTag, "I")
 	reader.SetDeadline(time.Now().Add(500 * time.Millisecond))
 	entry, _ = reader.ReadNext()
+	require.NotNil(t, entry)
 	assert.Equal(t, PriorityInfo, entry.Priority)
 
 	writer.W(testTag, "W")
 	reader.SetDeadline(time.Now().Add(500 * time.Millisecond))
 	entry, _ = reader.ReadNext()
+	require.NotNil(t, entry)
 	assert.Equal(t, PriorityWarn, entry.Priority)
 
 	writer.E(testTag, "E")
 	reader.SetDeadline(time.Now().Add(500 * time.Millisecond))
 	entry, _ = reader.ReadNext()
+	require.NotNil(t, entry)
 	assert.Equal(t, PriorityError, entry.Priority)
-
-	writer.F(testTag, "F")
-	reader.SetDeadline(time.Now().Add(500 * time.Millisecond))
-	entry, _ = reader.ReadNext()
-	assert.Equal(t, PriorityFatal, entry.Priority)
-
 }
 
 func ExampleLoggerWriter() {
