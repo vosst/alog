@@ -7,17 +7,17 @@ import (
 	"time"
 )
 
-func testLogPrintWorks(t *testing.T) {
-	skipIfNoAndroidLoggingFacilities(LogIdMain, t)
+func testLogPrintWorks(t *testing.T, logId LogId, prio Priority, tag Tag) {
+	skipIfNoAndroidLoggingFacilities(logId, t)
 
-	reader, err := NewLoggerReader(LogIdMain, nil)
+	reader, err := NewLoggerReader(logId, nil)
 	require.NoError(t, err)
 
 	defer reader.Close()
 
 	drainLog(reader)
 
-	l, err := NewLogger(LogIdMain, PriorityDebug, testTag, 0)
+	l, err := NewLogger(logId, prio, tag, 0)
 	require.NoError(t, err)
 
 	l.Print("42")
@@ -26,6 +26,33 @@ func testLogPrintWorks(t *testing.T) {
 	entry, err := reader.ReadNext()
 	require.NoError(t, err)
 
-	assert.Equal(t, PriorityDebug, entry.Priority)
-	assert.Equal(t, testTag, entry.Tag)
+	assert.Equal(t, prio, entry.Priority)
+	assert.Equal(t, tag, entry.Tag)
+}
+
+func TestLogPrintWorks(t *testing.T) {
+	testLogPrintWorks(t, LogIdMain, PriorityDebug, testTag)
+	testLogPrintWorks(t, LogIdMain, PriorityInfo, testTag)
+	testLogPrintWorks(t, LogIdMain, PriorityWarn, testTag)
+	testLogPrintWorks(t, LogIdMain, PriorityError, testTag)
+	testLogPrintWorks(t, LogIdMain, PriorityFatal, testTag)
+
+	testLogPrintWorks(t, LogIdRadio, PriorityDebug, testTag)
+	testLogPrintWorks(t, LogIdRadio, PriorityInfo, testTag)
+	testLogPrintWorks(t, LogIdRadio, PriorityWarn, testTag)
+	testLogPrintWorks(t, LogIdRadio, PriorityError, testTag)
+	testLogPrintWorks(t, LogIdRadio, PriorityFatal, testTag)
+
+	testLogPrintWorks(t, LogIdEvents, PriorityDebug, testTag)
+	testLogPrintWorks(t, LogIdEvents, PriorityInfo, testTag)
+	testLogPrintWorks(t, LogIdEvents, PriorityWarn, testTag)
+	testLogPrintWorks(t, LogIdEvents, PriorityError, testTag)
+	testLogPrintWorks(t, LogIdEvents, PriorityFatal, testTag)
+
+	testLogPrintWorks(t, LogIdSystem, PriorityDebug, testTag)
+	testLogPrintWorks(t, LogIdSystem, PriorityInfo, testTag)
+	testLogPrintWorks(t, LogIdSystem, PriorityWarn, testTag)
+	testLogPrintWorks(t, LogIdSystem, PriorityError, testTag)
+	testLogPrintWorks(t, LogIdSystem, PriorityFatal, testTag)
+
 }
