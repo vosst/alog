@@ -97,15 +97,15 @@ func NewLoggerReader(id LogId, abiExtension LoggerAbiExtension) (*LoggerReader, 
 		return nil, err
 	}
 
-	p, err := poller.NewFD(int(f.Fd()))
-	if err != nil {
-		return nil, err
-	}
-
 	if abiExtension != nil {
 		if err = requestExtendedLoggerAbi(int(f.Fd())); err != nil {
 			return nil, err
 		}
+	}
+
+	p, err := poller.NewFD(int(f.Fd()))
+	if err != nil {
+		return nil, err
 	}
 
 	return &LoggerReader{abiExtension: abiExtension, f: p, buf: make([]byte, maxEntrySize, maxEntrySize)}, nil
