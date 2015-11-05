@@ -17,7 +17,6 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 	"strings"
 	"syscall"
@@ -92,18 +91,15 @@ type LoggerReader struct {
 func NewLoggerReader(id LogId, abiExtension LoggerAbiExtension) (*LoggerReader, error) {
 	fn := filepath.Join("/dev", "alog", id.String())
 
-	f, err := os.Open(fn)
+	p, err := poller.Open(fn, poller.O_RO)
 	if err != nil {
 		return nil, err
 	}
 
-	p, err := poller.NewFD(int(f.Fd()))
-	if err != nil {
-		return nil, err
-	}
-
+	p.Lock()
+	defer p.Unlock()
 	if abiExtension != nil {
-		if err = requestExtendedLoggerAbi(int(f.Fd())); err != nil {
+		if err = requestExtendedLoggerAbi(p.Sysfd()); err != nil {
 			return nil, err
 		}
 	}
