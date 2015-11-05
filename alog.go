@@ -2,6 +2,13 @@ package alog
 
 import "log"
 
+var (
+	Main, _   = NewLoggerWriter(LogIdMain)   // Global Writer for accessing log Main.
+	Radio, _  = NewLoggerWriter(LogIdRadio)  // Global Writer for accessing log Radio.
+	Events, _ = NewLoggerWriter(LogIdEvents) // Global Writer for accessing log Events.
+	System, _ = NewLoggerWriter(LogIdSystem) // Global Writer for accessing log System.
+)
+
 type ioWriterWrapper struct {
 	prio   Priority
 	tag    Tag
@@ -34,4 +41,34 @@ func NewLogger(logId LogId, prio Priority, tag Tag, logFlags int) (*log.Logger, 
 
 	iow := &ioWriterWrapper{prio, tag, w}
 	return log.New(iow, "", logFlags), nil
+}
+
+// V logs message under tag with priority PriorityVerbose to w.
+func V(w Writer, tag Tag, message string) error {
+	return w.Write(PriorityVerbose, tag, message)
+}
+
+// D logs message under tag with priority PriorityDebug to w.
+func D(w Writer, tag Tag, message string) error {
+	return w.Write(PriorityDebug, tag, message)
+}
+
+// I logs message under tag with priority PriorityInfo to w.
+func I(w Writer, tag Tag, message string) error {
+	return w.Write(PriorityInfo, tag, message)
+}
+
+// W logs message under tag with priority PriorityWarning to w.
+func W(w Writer, tag Tag, message string) error {
+	return w.Write(PriorityWarn, tag, message)
+}
+
+// E logs message under tag with priority PriorityError to w.
+func E(w Writer, tag Tag, message string) error {
+	return w.Write(PriorityError, tag, message)
+}
+
+// F logs message under tag with priority PriorityFatal to w.
+func F(w Writer, tag Tag, message string) error {
+	return w.Write(PriorityFatal, tag, message)
 }
