@@ -51,3 +51,12 @@ func TestLogPrintWorks(t *testing.T) {
 	testLogPrintWorks(t, LogIdSystem, PriorityWarn, testTag)
 	testLogPrintWorks(t, LogIdSystem, PriorityError, testTag)
 }
+
+func ExampleNewLogger() {
+	l, err := NewLogger(LogIdMain, PriorityInfo, "MyTag", 0)
+	if err != nil {
+		panic(err)
+	}
+
+	l.Print("Test")
+}
