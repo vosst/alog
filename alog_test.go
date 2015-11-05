@@ -32,4 +32,22 @@ func testLogPrintWorks(t *testing.T, logId LogId, prio Priority, tag Tag) {
 
 func TestLogPrintWorks(t *testing.T) {
 	testLogPrintWorks(t, LogIdMain, PriorityDebug, testTag)
+	testLogPrintWorks(t, LogIdMain, PriorityInfo, testTag)
+	testLogPrintWorks(t, LogIdMain, PriorityWarn, testTag)
+	testLogPrintWorks(t, LogIdMain, PriorityError, testTag)
+
+	testLogPrintWorks(t, LogIdRadio, PriorityDebug, testTag)
+	testLogPrintWorks(t, LogIdRadio, PriorityInfo, testTag)
+	testLogPrintWorks(t, LogIdRadio, PriorityWarn, testTag)
+	testLogPrintWorks(t, LogIdRadio, PriorityError, testTag)
+
+	testLogPrintWorks(t, LogIdEvents, PriorityDebug, testTag)
+	testLogPrintWorks(t, LogIdEvents, PriorityInfo, testTag)
+	testLogPrintWorks(t, LogIdEvents, PriorityWarn, testTag)
+	testLogPrintWorks(t, LogIdEvents, PriorityError, testTag)
+
+	testLogPrintWorks(t, LogIdSystem, PriorityDebug, testTag)
+	testLogPrintWorks(t, LogIdSystem, PriorityInfo, testTag)
+	testLogPrintWorks(t, LogIdSystem, PriorityWarn, testTag)
+	testLogPrintWorks(t, LogIdSystem, PriorityError, testTag)
 }
