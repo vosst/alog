@@ -8,6 +8,8 @@ facilities.
 Writing to the Android logging facilities can be accomplished in multiple ways.
 For applications leveraging Go's log package, alog.NewLogger is the way to go:
 
+    import "github.com/vosst/alog"
+
     logger, err := alog.NewLogger(alog.LogIdMain)
     if err != nil {
     	panic(err)
@@ -17,6 +19,8 @@ For applications leveraging Go's log package, alog.NewLogger is the way to go:
 Convenience functions for all log levels are available and applications can
 output their tagged messages to Android's well-known logs as in the following
 example:
+
+    import "github.com/vosst/alog"
 
     alog.D(alog.Main, "tag", "message")
 
@@ -32,6 +36,11 @@ Reading from the Android logging facilities is abstracted by the interface
 Reader and its implementation LoggerReader. Applications can access Android's
 well known logs and read individual entries as illustrated in the following
 snippet:
+
+    import (
+    	"time"
+    	"github.com/vosst/alog"
+    )
 
     lr, err := alog.NewLoggerReader(alog.LogIdMain)
     lr.SetDeadline(time.Now().Add(500 * time.Millisecond))
