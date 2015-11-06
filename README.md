@@ -8,22 +8,22 @@ facilities.
 Writing to the Android logging facilities can be accomplished in multiple ways.
 For applications leveraging Go's log package, alog.NewLogger is the way to go:
 ```Go
-    import "github.com/vosst/alog"
+import "github.com/vosst/alog"
 
-    logger, err := alog.NewLogger(alog.LogIdMain)
-    if err != nil {
-    	panic(err)
-    }
+logger, err := alog.NewLogger(alog.LogIdMain)
+if err != nil {
+	panic(err)
+}
 
-    logger.Print("Successfully connected to Android's logging facilities")
+logger.Print("Successfully connected to Android's logging facilities")
 ```
 Convenience functions for all log levels are available and applications can
 output their tagged messages to Android's well-known logs as in the following
 example:
 ```Go
-    import "github.com/vosst/alog"
+import "github.com/vosst/alog"
 
-    alog.D(alog.Main, "tag", "message")
+alog.D(alog.Main, "tag", "message")
 ```
 Finally, applications can leverage the interface Writer and its implementation
 LoggerWriter to write to the Android logging facilities. The respective types
