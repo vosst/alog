@@ -96,9 +96,10 @@ import (
 	"github.com/vosst/alog/quirk"
 )
 
-chain := alog.ChainedLoggerAbiExtension{
-	Extensions: []alog.LoggerAbiExtesion{quirk.MeizuMx4LoggerAbiExtension{}, alog.LoggerAbiV2Extension{}},
-}
+mx4 := alog.MeizuMx4LoggerAbiExtension{}
+abiv2 := alog.LoggerAbiV2Extension{}
+
+chain := alog.ChainedLoggerAbiExtension{[]alog.LoggerAbiExtesion{mx4, abiv2}}
 
 lr, err := alog.NewLoggerReader(alog.LogIdMain, chain)
 if err != nil {
