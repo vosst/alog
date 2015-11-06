@@ -44,10 +44,12 @@ import (
 	"github.com/vosst/alog"
 )
 
-lr, err := alog.NewLoggerReader(alog.LogIdMain)
+lr, err := alog.NewLoggerReader(alog.LogIdMain, nil)
 if err != nil {
 	panic(err)
 }
+
+defer lr.Close()
 lr.SetDeadline(time.Now().Add(500 * time.Millisecond))
 
 // Loop over all entries in the log, waiting at most 500ms per iteration
@@ -57,4 +59,59 @@ for entry, err := lr.ReadNext(); err == nil; entry, err = lr.ReadNext() {
 	fmt.Printf("%s/%s(%5d): %s\n", entry.Priority, entry.Tag, entry.Pid, entry.Message)
 	lr.SetDeadline(time.Now().Add(500 * time.Millisecond))
 }
+```
+### A Tale of >= 2 ABIs
+
+Android's kernel logging facilities as available until Lollipop support two different ABIs (see https://android.googlesource.com/platform/system/core/+/android-4.4.4_r2.0.1/include/log/logger.h), with the main difference being an additional member `euid` per log entry. In addition, different SOCs have come up with all sorts of interesting variations of the version 2 ABI. Package alog supports all of them and is easily extensible to account for specific customizations. Applications can enable the v2 ABI by passing in a non-nil implementation of `alog.LoggerAbiExtension` to alog.NewLoggerReader as in:
+```Go
+import (
+	"fmt"
+	"time"
+
+	"github.com/vosst/alog"
+)
+
+lr, err := alog.NewLoggerReader(alog.LogIdMain, alog.LoggerAbiV2Extension{})
+if err != nil {
+	panic(err)
+}
+
+defer lr.Close()
+lr.SetDeadline(time.Now().Add(500 * time.Millisecond))
+
+for entry, err := lr.ReadNext(); err == nil; entry, err = lr.ReadNext() {
+	fmt.Printf("%s/%s(%5d)@%d: %s\n", entry.Priority, entry.Tag, entry.Pid, entry.Message, entry.Ext["euid"])
+	lr.SetDeadline(time.Now().Add(500 * time.Millisecond))
+}
+```
+
+SOC-specific quirks are supported by chaining together multiple implementations of
+`alog.LoggerAbiExtesion` and passing the respective chain into the NewLoggerReader call:
+```Go
+import (
+	"fmt"
+	"time"
+
+	"github.com/vosst/alog"
+	"github.com/vosst/alog/quirk"
+)
+
+mx4 := alog.MeizuMx4LoggerAbiExtension{}
+abiv2 := alog.LoggerAbiV2Extension{}
+
+chain := alog.ChainedLoggerAbiExtension{[]alog.LoggerAbiExtesion{mx4, abiv2}}
+
+lr, err := alog.NewLoggerReader(alog.LogIdMain, chain)
+if err != nil {
+	panic(err)
+}
+
+defer lr.Close()
+lr.SetDeadline(time.Now().Add(500 * time.Millisecond))
+
+for entry, err := lr.ReadNext(); err == nil; entry, err = lr.ReadNext() {
+	fmt.Printf("%s/%s(%5d)@%d|%d: %s\n", entry.Priority, entry.Tag, entry.Pid, entry.Message, entry.Ext["euid"], entry.Ext["tz"])
+	lr.SetDeadline(time.Now().Add(500 * time.Millisecond))
+}
+
 ```
