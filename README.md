@@ -36,14 +36,22 @@ Reading from the Android logging facilities is abstracted by the interface
 Reader and its implementation LoggerReader. Applications can access Android's
 well known logs and read individual entries as illustrated in the following
 snippet:
+```Go
+package main
 
-    import (
-    	"time"
-    	"github.com/vosst/alog"
-    )
+import (
+	"fmt"
+	"time"
 
-    lr, err := alog.NewLoggerReader(alog.LogIdMain)
-    lr.SetDeadline(time.Now().Add(500 * time.Millisecond))
-    for entry, err := lr.ReadNext(); err == nil; entry, err = lr.ReadNext() {
-    	lr.SetDeadline(time.Now().Add(500 * time.Millisecond))
-    }
+	"github.com/vosst/alog"
+)
+
+func main() {
+	lr, err := alog.NewLoggerReader(alog.LogIdMain)
+	lr.SetDeadline(time.Now().Add(500 * time.Millisecond))
+	for entry, err := lr.ReadNext(); err == nil; entry, err = lr.ReadNext() {
+		fmt.Printf("%s/%s(%5d): %s\n", entry.Priority, entry.Tag, entry.Pid, entry.Message)
+		lr.SetDeadline(time.Now().Add(500 * time.Millisecond))
+	}
+}
+```
