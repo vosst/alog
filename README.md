@@ -60,7 +60,7 @@ for entry, err := lr.ReadNext(); err == nil; entry, err = lr.ReadNext() {
 	lr.SetDeadline(time.Now().Add(500 * time.Millisecond))
 }
 ```
-## A Tale of >= 2 ABIs
+### A Tale of >= 2 ABIs
 
 Android's kernel logging facilities as available until Lollipop support two different ABIs (see https://android.googlesource.com/platform/system/core/+/android-4.4.4_r2.0.1/include/log/logger.h), with the main difference being an additional member `euid` per log entry. In addition, different SOCs have come up with all sorts of interesting variations of the version 2 ABI. Package alog supports all of them and is easily extensible to account for specific customizations. Applications can enable the v2 ABI by passing in a non-nil implementation of `alog.LoggerAbiExtension` to alog.NewLoggerReader as in:
 ```Go
@@ -83,4 +83,34 @@ for entry, err := lr.ReadNext(); err == nil; entry, err = lr.ReadNext() {
 	fmt.Printf("%s/%s(%5d)@%d: %s\n", entry.Priority, entry.Tag, entry.Pid, entry.Message, entry.Ext["euid"])
 	lr.SetDeadline(time.Now().Add(500 * time.Millisecond))
 }
+```
+
+SOC-specific quirks are supported by chaining together multiple implementations of
+`alog.LoggerAbiExtesion` and passing the respective chain into the NewLoggerReader call:
+```Go
+import (
+	"fmt"
+	"time"
+
+	"github.com/vosst/alog"
+	"github.com/vosst/alog/quirk"
+)
+
+chain := alog.ChainedLoggerAbiExtension{
+	Extensions: []alog.LoggerAbiExtesion{quirk.MeizuMx4LoggerAbiExtension{}, alog.LoggerAbiV2Extension{}},
+}
+
+lr, err := alog.NewLoggerReader(alog.LogIdMain, chain)
+if err != nil {
+	panic(err)
+}
+
+defer lr.Close()
+lr.SetDeadline(time.Now().Add(500 * time.Millisecond))
+
+for entry, err := lr.ReadNext(); err == nil; entry, err = lr.ReadNext() {
+	fmt.Printf("%s/%s(%5d)@%d|%d: %s\n", entry.Priority, entry.Tag, entry.Pid, entry.Message, entry.Ext["euid"], entry.Ext["tz"])
+	lr.SetDeadline(time.Now().Add(500 * time.Millisecond))
+}
+
 ```
