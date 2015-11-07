@@ -115,3 +115,8 @@ for entry, err := lr.ReadNext(); err == nil; entry, err = lr.ReadNext() {
 }
 
 ```
+
+## TODO
+ - [ ] Add support for Lollipop's logd.
+ - [ ] Investigate into CI offerings for running tests on Android.
+ - [ ] Factor out read/write access to Android's kernel logger into itf LoggerDevice.
